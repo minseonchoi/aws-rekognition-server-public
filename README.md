@@ -1,131 +1,75 @@
-<!--
-title: 'Serverless Framework Python Flask API on AWS'
-description: 'This template demonstrates how to develop and deploy a simple Python Flask API running on AWS Lambda using the traditional Serverless Framework.'
-layout: Doc
-framework: v3
-platform: AWS
-language: Python
-priority: 2
-authorLink: 'https://github.com/serverless'
-authorName: 'Serverless, inc.'
-authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4'
--->
+<img src="https://capsule-render.vercel.app/api?type=rounded&color=848484&height=150&section=header&text=AWS_REKOGNITION&fontColor=fff&animation=fadeIn&fontSize=50&stroke=000&strokeWidth=2" />
 
-# Serverless Framework Python Flask API on AWS
+# AWS Rekognition을 이용한 얼굴 분석 / 비교
+### 인공지능을 활용한 사람 얼굴 분석 및 다른 사진으로 얼굴 비교하는 Restful API 개발
 
-This template demonstrates how to develop and deploy a simple Python Flask API service running on AWS Lambda using the traditional Serverless Framework.
+[프로젝트 기술서](https://docs.google.com/presentation/d/1-g3qrPQgLSEf4EAF7lSF51oon1FUoZCw06Cc2ufK5_o/edit#slide=id.g2e7a2ec5a3f_0_107)
 
 
-## Anatomy of the template
+✏️ 작업순서
+-
 
-This template configures a single function, `api`, which is responsible for handling all incoming requests thanks to configured `httpApi` events. To learn more about `httpApi` event configuration options, please refer to [httpApi event docs](https://www.serverless.com/framework/docs/providers/aws/events/http-api/). As the events are configured in a way to accept all incoming requests, `Flask` framework is responsible for routing and handling requests internally. The implementation takes advantage of `serverless-wsgi`, which allows you to wrap WSGI applications such as Flask apps. To learn more about `serverless-wsgi`, please refer to corresponding [GitHub repository](https://github.com/logandk/serverless-wsgi). Additionally, the template relies on `serverless-python-requirements` plugin for packaging dependencies from `requirements.txt` file. For more details about `serverless-python-requirements` configuration, please refer to corresponding [GitHub repository](https://github.com/UnitedIncome/serverless-python-requirements).
+AWS Rekognition 공식 문서 확인 ➡︎ serverless 서버 생성 ➡︎ vsc 코드 개발 ➡︎ Postman 단위 테스트 ➡︎ github 레파지토리 생성 ➡︎ git Actions CI/CD 자동 배포 ➡︎ CloudWatch 로그 확인 후 디버깅 
 
-## Usage
 
-### Prerequisites
+✏️ Server 개발
+-
 
-In order to package your dependencies locally with `serverless-python-requirements`, you need to have `Python3.9` installed locally. You can create and activate a dedicated virtual environment with the following command:
+Visual Studio Code를 사용해서 서버 개발 (Python)
+- Framwork는 Flask, Serverless 사용했습니다.
 
-```bash
-python3.9 -m venv ./venv
-source ./venv/bin/activate
-```
+서버 아키텍처
+- AWS IAM, LAMBDA로 구성했습니다. 
 
-Alternatively, you can also use `dockerizePip` configuration from `serverless-python-requirements`. For details on that, please refer to corresponding [GitHub repository](https://github.com/UnitedIncome/serverless-python-requirements).
+VSC 폴더명으로 정리했습니다.
+✉︎ APP.PY
+- flask 를 사용하기 위한 코드 세팅
+- Entry Point. api.add_resource 입력
 
-### Deployment
+✉︎ REKOGNITION.PY
+- 얼굴 분석하는 코드
+  
+  : AWS IAM 권한을 주고 인공지능 Access key로 사용
+  
+  : boto3 라이브러리를 사용하여 사진이 AWS S3에 업데이트 되면 해당 사진을 분석
+  
+  ![얼굴 분석](https://github.com/user-attachments/assets/e31a2fe6-949c-4c80-b3c2-1f587a151e46)
 
-This example is made to work with the Serverless Framework dashboard, which includes advanced features such as CI/CD, monitoring, metrics, etc.
+- 얼굴 비교하는 코드
+  
+  : AWS IAM 권한을 주고 인공지능 Access key로 사용
+  
+  : boto3 라이브러리를 사용하여 비교할 두개의 사진을 AWS S3에 업데이트하고 compare_face 함수로 타겟 파일을 지정해 얼굴 비교
+  
+  ![얼굴 비교](https://github.com/user-attachments/assets/290d5d50-e033-4ab0-8319-bc5976349acd)
 
-In order to deploy with dashboard, you need to first login with:
 
-```
-serverless login
-```
 
-install dependencies with:
 
-```
-npm install
-```
+✏️ 배포
+-
 
-and
+serverless, AWS LAMBDA,  AWS Later - pillow 사용해서 배포
+: Docker 사용하지 않은 이유 -> 레이어 용량엔 한계가 있지만, pillow 라이브러리 한개만 올리면 되기 때문에 도커를 사용하지 않고 레이어에 넣어서 디버깅
 
-```
-pip install -r requirements.txt
-```
+github Actions로 git pull 자동화
 
-and then perform deployment with:
 
-```
-serverless deploy
-```
 
-After running deploy, you should see output similar to:
+✏️ 사용한 프로그램
+-
 
-```bash
-Deploying aws-python-flask-api-project to stage dev (us-east-1)
+<img src="https://img.shields.io/badge/Amazon AWS-232F3E?style=flat-square&logo=amazonaws&logoColor=white"/>
+<img src="https://img.shields.io/badge/Visual Studio Code-007ACC?style=flat-square&logo=Visual Studio Code&logoColor=white"/>
 
-✔ Service deployed to stack aws-python-flask-api-project-dev (182s)
 
-endpoint: ANY - https://xxxxxxxx.execute-api.us-east-1.amazonaws.com
-functions:
-  api: aws-python-flask-api-project-dev-api (1.5 MB)
-```
+<img src="https://img.shields.io/badge/Flask-000000?style=flat-square&logo=flask&logoColor=white"/> <img src="https://img.shields.io/badge/serverless-FD5750?style=flat-square&logo=serverless&logoColor=white"/>
 
-_Note_: In current form, after deployment, your API is public and can be invoked by anyone. For production deployments, you might want to configure an authorizer. For details on how to do that, refer to [httpApi event docs](https://www.serverless.com/framework/docs/providers/aws/events/http-api/).
 
-### Invocation
 
-After successful deployment, you can call the created application via HTTP:
+✏️ 사용한 언어
+-
 
-```bash
-curl https://xxxxxxx.execute-api.us-east-1.amazonaws.com/dev/
-```
+<img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=Python&logoColor=white"/>
 
-Which should result in the following response:
 
-```
-{"message":"Hello from root!"}
-```
-
-Calling the `/hello` path with:
-
-```bash
-curl https://xxxxxxx.execute-api.us-east-1.amazonaws.com/dev/hello
-```
-
-Should result in the following response:
-
-```bash
-{"message":"Hello from path!"}
-```
-
-If you try to invoke a path or method that does not have a configured handler, e.g. with:
-
-```bash
-curl https://xxxxxxx.execute-api.us-east-1.amazonaws.com/dev/nonexistent
-```
-
-You should receive the following response:
-
-```bash
-{"error":"Not Found!"}
-```
-
-### Local development
-
-Thanks to capabilities of `serverless-wsgi`, it is also possible to run your application locally, however, in order to do that, you will need to first install `werkzeug` dependency, as well as all other dependencies listed in `requirements.txt`. It is recommended to use a dedicated virtual environment for that purpose. You can install all needed dependencies with the following commands:
-
-```bash
-pip install werkzeug
-pip install -r requirements.txt
-```
-
-At this point, you can run your application locally with the following command:
-
-```bash
-serverless wsgi serve
-```
-
-For additional local development capabilities of `serverless-wsgi` plugin, please refer to corresponding [GitHub repository](https://github.com/logandk/serverless-wsgi).
